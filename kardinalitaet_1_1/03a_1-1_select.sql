@@ -1,7 +1,18 @@
-
+\! cls 
 -- SELECTS
+SELECT * FROM design.cats;
+SELECT * FROM design.servants;
 
 -- Einzeltabellen
+-- Alle Katzen mit bestimmtem Namen
+SELECT * 
+FROM design.cats
+WHERE cat_name = 'Grizabella';
+
+-- Alle Diener mit mehr als 5 Jahren Dienstzeit
+SELECT *
+FROM design.servants
+WHERE yrs_served > 5;
 
 
 -- Kreuzprodukt (Kartesisches Produkt)
