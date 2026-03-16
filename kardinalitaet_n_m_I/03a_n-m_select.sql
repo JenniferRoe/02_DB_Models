@@ -59,165 +59,153 @@
 -- ;
 
 
-SELECT
-    yrs_served AS Zeit,
-    CONCAT(servant_name, " - der Diener von ", cat_name, " - ist der Diener mit der laengsten Dienstzeit") AS Dienstzeit
-FROM design.cats INNER JOIN design.servants
-ON design.cats.id = design.servants.cats_id
-WHERE yrs_served = (SELECT MAX(yrs_served) FROM design.servants)
-;
+-- SELECT
+--     yrs_served AS Zeit,
+--     CONCAT(servant_name, " - der Diener von ", cat_name, " - ist der Diener mit der laengsten Dienstzeit") AS Dienstzeit
+-- FROM design.cats INNER JOIN design.servants
+-- ON design.cats.id = design.servants.cats_id
+-- WHERE yrs_served = (SELECT MAX(yrs_served) FROM design.servants)
+-- ;
 
 
-DROP VIEW IF EXISTS design.max_time;
+-- DROP VIEW IF EXISTS design.max_time;
 
-CREATE VIEW design.max_time AS 
-SELECT 
-    MAX(yrs_served) AS Test
-FROM design.servants;
+-- CREATE VIEW design.max_time AS 
+-- SELECT 
+--     MAX(yrs_served) AS Test
+-- FROM design.servants;
 
-SELECT * FROM design.max_time;
+-- SELECT * FROM design.max_time;
 
-SELECT
-    yrs_served AS Zeit,
-    CONCAT(servant_name, " - der Diener von ", cat_name, " - ist der Diener mit der laengsten Dienstzeit") AS Dienstzeit
-FROM design.cats INNER JOIN design.servants
-ON design.cats.id = design.servants.cats_id
-WHERE yrs_served = (SELECT * FROM design.max_time)
-;
+-- SELECT
+--     yrs_served AS Zeit,
+--     CONCAT(servant_name, " - der Diener von ", cat_name, " - ist der Diener mit der laengsten Dienstzeit") AS Dienstzeit
+-- FROM design.cats INNER JOIN design.servants
+-- ON design.cats.id = design.servants.cats_id
+-- WHERE yrs_served = (SELECT * FROM design.max_time)
+-- ;
 
-
-/*\! cls
-
-
-
-DROP TABLE IF EXISTS design.purchases;
-DROP TABLE IF EXISTS design.products;
-DROP TABLE IF EXISTS design.servants;
+-- \! cls
 
 
 
-
-
---TABELLE servants
-
-
-CREATE TABLE design.servants
-(
-    id INT NOT NULL AUTO_INCREMENT COMMENT 'PK',
-    servant_name VARCHAR(45) NOT NULL,
-    yrs_served TINYINT NOT NULL,
-    PRIMARY KEY (id)
-) COMMENT 'Tabelle der Diener';
-
-DESCRIBE design.servants;
-
-INSERT INTO design.servants (id, servant_name, yrs_served)
-VALUES
-(DEFAULT, 'Jocelyn', 11),
-(DEFAULT, 'Jeremiah', 8);
-
-SELECT * 
-FROM design.servants;
+-- DROP TABLE IF EXISTS design.purchases;
+-- DROP TABLE IF EXISTS design.products;
+-- DROP TABLE IF EXISTS design.servants;
 
 
 
 
 
---TABELLE products
+-- --TABELLE servants
 
 
-CREATE TABLE design.products
-(
-    id INT NOT NULL AUTO_INCREMENT COMMENT 'PK',
-    product_name VARCHAR(45) NOT NULL,
-    product_price DECIMAL(4,2) NOT NULL,
-    PRIMARY KEY (id)
-) COMMENT 'Tabelle der Produkte';
+-- CREATE TABLE design.servants
+-- (
+--     id INT NOT NULL AUTO_INCREMENT COMMENT 'PK',
+--     servant_name VARCHAR(45) NOT NULL,
+--     yrs_served TINYINT NOT NULL,
+--     PRIMARY KEY (id)
+-- ) COMMENT 'Tabelle der Diener';
 
-DESCRIBE design.products;
+-- DESCRIBE design.servants;
 
-INSERT INTO design.products (id, product_name, product_price)
-VALUES
-(DEFAULT, 'WhiskasLachs', 2.75),
-(DEFAULT, 'WhiskasHuhn', 2.80),
-(DEFAULT, 'FelixJelly', 3.75),
-(DEFAULT, 'FelixSauce', 3.80);
+-- INSERT INTO design.servants (id, servant_name, yrs_served)
+-- VALUES
+-- (DEFAULT, 'Jocelyn', 11),
+-- (DEFAULT, 'Jeremiah', 8);
 
-SELECT * 
-FROM design.products;
-
-
-
-
-
--- TABELLE purchases
-
-
-CREATE TABLE design.purchases
-(
-    id INT NOT NULL AUTO_INCREMENT COMMENT 'PK',
-    servants_id INT NOT NULL,
-    products_id INT NOT NULL,
-    p_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (id),
-
-    CONSTRAINT fk_purchases_servants
-        FOREIGN KEY (servants_id) REFERENCES design.servants(id),
-
-    CONSTRAINT fk_purchases_products
-        FOREIGN KEY (products_id) REFERENCES design.products(id)
-) COMMENT 'Tabelle der Käufe';
-
-DESCRIBE design.purchases;
-
-INSERT INTO design.purchases (id, servants_id, products_id, p_time)
-VALUES
-(DEFAULT, 1, 2, '2026-03-13 09:52:20'),
-(DEFAULT, 1, 3, '2026-03-13 10:04:20'),
-(DEFAULT, 2, 1, '2026-03-13 10:16:20'),
-(DEFAULT, 2, 2, '2026-03-13 10:28:20'),
-(DEFAULT, 2, 3, '2026-03-13 10:40:20'),
-(DEFAULT, 2, 4, '2026-03-13 10:52:20');
-
-SELECT * 
-FROM design.purchases;
-
-
--- EINZELTABELLEN
-
-
-SELECT *
-FROM design.servants;
-
-SELECT *
-FROM design.products;
-
-SELECT *
-FROM design.purchases;
+-- SELECT * 
+-- FROM design.servants;
 
 
 
 
 
+-- --TABELLE products
 
---INNER JOIN / KOMBINATION (servants + purchases + products)
+
+-- CREATE TABLE design.products
+-- (
+--     id INT NOT NULL AUTO_INCREMENT COMMENT 'PK',
+--     product_name VARCHAR(45) NOT NULL,
+--     product_price DECIMAL(4,2) NOT NULL,
+--     PRIMARY KEY (id)
+-- ) COMMENT 'Tabelle der Produkte';
+
+-- DESCRIBE design.products;
+
+-- INSERT INTO design.products (id, product_name, product_price)
+-- VALUES
+-- (DEFAULT, 'WhiskasLachs', 2.75),
+-- (DEFAULT, 'WhiskasHuhn', 2.80),
+-- (DEFAULT, 'FelixJelly', 3.75),
+-- (DEFAULT, 'FelixSauce', 3.80);
+
+-- SELECT * 
+-- FROM design.products;
 
 
-SELECT
-    s.servant_name AS diener,
-    s.yrs_served AS dienstjahre,
-    pr.product_name AS produkt,
-    pr.product_price AS preis,
-    pu.p_time AS kaufzeit
-FROM design.purchases pu
 
-INNER JOIN design.servants s
-    ON pu.servants_id = s.id
 
-INNER JOIN design.products pr
-    ON pu.products_id = pr.id
 
-ORDER BY pu.p_time;
+-- -- TABELLE purchases
+
+
+-- CREATE TABLE design.purchases
+-- (
+--     id INT NOT NULL AUTO_INCREMENT COMMENT 'PK',
+--     servants_id INT NOT NULL,
+--     products_id INT NOT NULL,
+--     p_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+--     PRIMARY KEY (id),
+
+--     CONSTRAINT fk_purchases_servants
+--         FOREIGN KEY (servants_id) REFERENCES design.servants(id),
+
+--     CONSTRAINT fk_purchases_products
+--         FOREIGN KEY (products_id) REFERENCES design.products(id)
+-- ) COMMENT 'Tabelle der Käufe';
+
+-- DESCRIBE design.purchases;
+
+-- INSERT INTO design.purchases (id, servants_id, products_id, p_time)
+-- VALUES
+-- (DEFAULT, 1, 2, '2026-03-13 09:52:20'),
+-- (DEFAULT, 1, 3, '2026-03-13 10:04:20'),
+-- (DEFAULT, 2, 1, '2026-03-13 10:16:20'),
+-- (DEFAULT, 2, 2, '2026-03-13 10:28:20'),
+-- (DEFAULT, 2, 3, '2026-03-13 10:40:20'),
+-- (DEFAULT, 2, 4, '2026-03-13 10:52:20');
+
+-- SELECT * 
+-- FROM design.purchases;
+
+# Einzeltabellen
+SELECT * FROM design.servants;
+SELECT * FROM design.products;
+SELECT * FROM design.purchases;
+
+
+-- SELECT
+--     *
+-- FROM design.purchases
+-- INNER JOIN design.servants ON design.servants.id = design.purchases.servants_id
+-- INNER JOIN design.products ON design.products.id = design.purchases.products_id
+-- ;
+
+
+
+-- SELECT
+--     servant_name AS Diener,
+--     product_name AS "Von X gekaufte Produkte:",
+--     CONCAT(servant_name, " kauft ", product_name, ".") AS Kaufhandlung
+-- FROM design.purchases
+-- INNER JOIN design.servants ON design.servants.id = design.purchases.servants_id
+-- INNER JOIN design.products ON design.products.id = design.purchases.products_id
+-- -- WHERE servant_name = "MAX"
+-- -- WHERE servant_name LIKE "%ine"
+-- ;
 
 
 
@@ -225,102 +213,113 @@ ORDER BY pu.p_time;
 --  Beispiel: Max
 
 
-SELECT
-    s.servant_name AS diener,
-    pr.product_name AS produkt,
-    pr.product_price AS preis,
-    pu.p_time AS kaufzeit
-FROM design.purchases pu
+-- SELECT
+--     s.servant_name AS Diener,
+--     pr.product_name AS Produkt,
+--     pr.product_price AS PREIS,
+--     pu.p_time AS kaufzeit
+-- FROM design.purchases pu
 
-INNER JOIN design.servants s
-    ON pu.servants_id = s.id
+-- INNER JOIN design.servants s
+--     ON pu.servants_id = s.id
 
-INNER JOIN design.products pr
-    ON pu.products_id = pr.id
+-- INNER JOIN design.products pr
+--     ON pu.products_id = pr.id
 
-WHERE s.servant_name = 'Max'
-ORDER BY pu.p_time;
-
-
-
-
-
--- WIEVIELE PRODUKTE HAT X GEKAUFT?
-   --"X kauft Y Produkte"
-
-SELECT
-    s.servant_name AS diener,
-    COUNT(pu.id) AS anzahl_produkte
-FROM design.purchases pu
-
-INNER JOIN design.servants s
-    ON pu.servants_id = s.id
-
-GROUP BY s.id, s.servant_name
-ORDER BY anzahl_produkte DESC;
-
-
-
--- WIEVIEL GELD HAT JEDER DIENER AUSGEGEBEN?
-
-SELECT
-    s.servant_name AS diener,
-    COUNT(pu.id) AS anzahl_kaeufe,
-    ROUND(SUM(pr.product_price), 2) AS gesamt_ausgegeben
-FROM design.purchases pu
-
-INNER JOIN design.servants s
-    ON pu.servants_id = s.id
-
-INNER JOIN design.products pr
-    ON pu.products_id = pr.id
-
-GROUP BY s.id, s.servant_name
-ORDER BY gesamt_ausgegeben DESC;
+-- WHERE s.servant_name = 'Max'
+-- ORDER BY pu.p_time;
 
 
 
 
 
--- WER HAT DAS PRODUKT X GEKAUFT?
-  -- Beispiel mit exakt einem Produktnamen: WhiskasLachs
-SELECT
-    s.servant_name AS diener,
-    pr.product_name AS produkt,
-    pu.p_time AS kaufzeit
-FROM design.purchases pu
+-- -- WIEVIELE PRODUKTE HAT X GEKAUFT?
+--    --"X kauft Y Produkte"
 
-INNER JOIN design.servants s
-    ON pu.servants_id = s.id
+-- SELECT
+--     s.servant_name AS diener,
+--     COUNT(pu.id) AS anzahl_produkte
+-- FROM design.purchases pu
 
-INNER JOIN design.products pr
-    ON pu.products_id = pr.id
+-- INNER JOIN design.servants s ON pu.servants_id = s.id
+-- INNER JOIN design.products pr ON pu.products_id = pr.id
 
-WHERE pr.product_name = 'WhiskasLachs'
-ORDER BY pu.p_time;
+-- GROUP BY s.id, s.servant_name
+-- ORDER BY anzahl_produkte DESC, diener ASC;
+
+#Variante2
+
+-- SELECT
+--     CONCAT(servant_name, " kauft ", COUNT(product_name), " Produkte.") AS Kaufhandlung
+-- FROM design.purchases
+-- INNER JOIN design.servants ON design.servants.id = design.purchases.servants_id
+-- INNER JOIN design.products ON design.products.id = design.purchases.products_id
+-- GROUP BY servant_name -- organisch / aggregiert
+-- -- HAVING servant_name = "TBA"
+-- -- HAVING servant_name LIKE "TBA"
+-- ;
+
+
+-- -- WIEVIEL GELD HAT JEDER DIENER AUSGEGEBEN?
+
+-- SELECT
+--     s.servant_name AS diener,
+--     COUNT(pu.id) AS anzahl_käufe,
+--     ROUND(SUM(pr.product_price), 2) AS gesamtausgaben
+-- FROM design.purchases pu
+
+-- INNER JOIN design.servants s
+--     ON pu.servants_id = s.id
+
+-- INNER JOIN design.products pr
+--     ON pu.products_id = pr.id
+
+-- GROUP BY s.id, s.servant_name
+-- ORDER BY gesamtausgaben DESC;
 
 
 
 
 
--- WER HAT PRODUKTE MIT BESTIMMTEM NAMEN GEKAUFT?
--- Beispiel mit LIKE: alles mit 'Lachs'
+-- -- WER HAT DAS PRODUKT X GEKAUFT?
+--   -- Beispiel mit exakt einem Produktnamen: WhiskasLachs
+-- SELECT
+--     s.servant_name AS diener,
+--     pr.product_name AS produkt,
+--     pu.p_time AS kaufzeit
+-- FROM design.purchases pu
+
+-- INNER JOIN design.servants s
+--     ON pu.servants_id = s.id
+
+-- INNER JOIN design.products pr
+--     ON pu.products_id = pr.id
+
+-- WHERE pr.product_name = 'WhiskasLachs'
+-- ORDER BY pu.p_time;
 
 
-SELECT
-    s.servant_name AS diener,
-    pr.product_name AS produkt,
-    pu.p_time AS kaufzeit
 
-FROM design.purchases pu
-INNER JOIN design.servants s
-    ON pu.servants_id = s.id
 
-INNER JOIN design.products pr
-    ON pu.products_id = pr.id
 
-WHERE pr.product_name LIKE '%Lachs%'
-ORDER BY pu.p_time;
+-- -- WER HAT PRODUKTE MIT BESTIMMTEM NAMEN GEKAUFT?
+-- -- Beispiel mit LIKE: alles mit 'Lachs'
+
+
+-- SELECT
+--     s.servant_name AS diener,
+--     pr.product_name AS produkt,
+--     pu.p_time AS kaufzeit
+
+-- FROM design.purchases pu
+-- INNER JOIN design.servants s
+--     ON pu.servants_id = s.id
+
+-- INNER JOIN design.products pr
+--     ON pu.products_id = pr.id
+
+-- WHERE pr.product_name LIKE '%Lachs%'
+-- ORDER BY pu.p_time;
 
 
 
@@ -329,20 +328,20 @@ ORDER BY pu.p_time;
 -- WER HAT PRODUKTE MIT 'Sauce' GEKAUFT?
 
 
-SELECT
-    s.servant_name AS diener,
-    pr.product_name AS produkt,
-    pu.p_time AS kaufzeit
-FROM design.purchases pu
+-- SELECT
+--     s.servant_name AS diener,
+--     pr.product_name AS produkt,
+--     pu.p_time AS kaufzeit
+-- FROM design.purchases pu
 
-INNER JOIN design.servants s
-    ON pu.servants_id = s.id
+-- INNER JOIN design.servants s
+--     ON pu.servants_id = s.id
 
-INNER JOIN design.products pr
-    ON pu.products_id = pr.id
+-- INNER JOIN design.products pr
+--     ON pu.products_id = pr.id
 
-WHERE pr.product_name LIKE '%Sauce%'
-ORDER BY pu.p_time;
+-- WHERE pr.product_name LIKE '%Sauce%'
+-- ORDER BY pu.p_time;
 
 
 
@@ -352,16 +351,16 @@ ORDER BY pu.p_time;
 -- Beispiel: WhiskasHuhn
 
 
-SELECT
-    pr.product_name AS produkt,
-    COUNT(pu.id) AS anzahl_gekauft
-FROM design.purchases pu
+-- SELECT
+--     pr.product_name AS produkt,
+--     COUNT(pu.id) AS anzahl_gekauft
+-- FROM design.purchases pu
 
-INNER JOIN design.products pr
-    ON pu.products_id = pr.id
+-- INNER JOIN design.products pr
+--     ON pu.products_id = pr.id
 
-WHERE pr.product_name = 'WhiskasHuhn'
-GROUP BY pr.id, pr.product_name;
+-- WHERE pr.product_name = 'WhiskasHuhn'
+-- GROUP BY pr.id, pr.product_name;
 
 
 
@@ -384,12 +383,10 @@ ORDER BY anzahl_gekauft DESC, pr.product_name;
 
 
 
+-- WELCHEN UMSATZ HATTE PRODUKT X?
+-- Beispiel: FelixJelly
+-- Umsatz = Anzahl * Preis
 
-/*  WELCHEN UMSATZ HATTE PRODUKT X?
-Beispiel: FelixJelly
-Umsatz = Anzahl * Preis
- */
-/*
 SELECT
     pr.product_name AS produkt,
     COUNT(pu.id) AS anzahl_verkauft,
@@ -420,4 +417,3 @@ INNER JOIN design.products pr
     ON pu.products_id = pr.id
 GROUP BY pr.id, pr.product_name, pr.product_price
 ORDER BY umsatz DESC;
-/*
